@@ -100,11 +100,50 @@ export default class Board {
 
 		return new Tile(x, y, colour, pattern, this.tileSprites);
 	}
-
-	async swapTiles(selectedTile, highlightedTile) {
+	/**
+	 * Re-swap tiles if there is no match after a swap.
+	/**/
+	async revertSwap(swappedTile, originalTile) {
 		const temporaryTile = new Tile(
-			selectedTile.boardX,
-			selectedTile.boardY
+			swappedTile.boardX,
+			swappedTile.boardY
+		);
+		this.isSwapping = true;
+
+		timer.tweenAsync(
+			originalTile,
+			{ x: temporaryTile.x, y: temporaryTile.y },
+			0.2,
+			Easing.easeInQuad
+		)
+		timer.tweenAsync(
+			swappedTile,
+			{ x: originalTile.x, y: originalTile.y },
+			0.2,
+			Easing.easeInQuad
+		);
+		this.isSwapping = false;
+
+		// Save the current positions
+		const origX = originalTile.boardX;
+		const origY = originalTile.boardY;
+		const swapX = swappedTile.boardX;
+		const swapY = swappedTile.boardY;
+
+		// Swap board positions
+		originalTile.boardX = swapX;
+		originalTile.boardY = swapY;
+		swappedTile.boardX = origX;
+		swappedTile.boardY = origY;
+
+		// Swap tiles in the tiles array
+		this.tiles[originalTile.boardY][originalTile.boardX] = originalTile;
+		this.tiles[swappedTile.boardY][swappedTile.boardX] = swappedTile;
+			}
+		async swapTiles(selectedTile, highlightedTile) {
+			const temporaryTile = new Tile(
+				selectedTile.boardX,
+				selectedTile.boardY
 		);
 
 		this.isSwapping = true;

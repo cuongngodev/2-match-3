@@ -35,7 +35,7 @@ export default class PlayState extends State {
 		 * reach the scoreGoal before time runs out. The timer
 		 * is reset when entering a new level.
 		 */
-		this.maxTimer = 60;
+		this.maxTimer = 6000;
 		this.timer = this.maxTimer;
 		this.secondIncrement = 2; // seconds added per match
 	}
@@ -141,6 +141,15 @@ export default class PlayState extends State {
 
 	async swapTiles(highlightedTile) {
 		await this.board.swapTiles(this.selectedTile, highlightedTile);
+		// calculate matches 
+		if (!this.isMatch()) {
+			this.board.revertSwap(this.selectedTile, highlightedTile)
+
+			;
+			sounds.play(SoundName.Error);
+			
+		}
+		// if there is no match , swap back
 		this.selectedTile = null;
 		await this.calculateMatches();
 	}
@@ -203,7 +212,9 @@ export default class PlayState extends State {
 		context.fillText(`${this.scoreGoal}`, 250, this.board.y + 165);
 		context.fillText(`${this.timer}`, 250, this.board.y + 225);
 	}
-
+	isMatch() {
+		return this.board.matches.length != 0
+	}
 	/**
 	 * Calculates whether any matches were found on the board and tweens the needed
 	 * tiles to their new destinations if so. Also removes tiles from the board that
@@ -215,8 +226,8 @@ export default class PlayState extends State {
 		this.board.calculateMatches();
 
 		// If no matches, then no need to proceed with the function.
-		if (this.board.matches.length === 0) {
-			return;
+		if (!this.isMatch()) {
+			return null;
 		}
 
 		this.calculateScore();

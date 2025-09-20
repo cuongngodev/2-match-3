@@ -7,3 +7,7 @@ export const getRandomNegativeNumber = (min, max) => (Math.random() * (max - min
 export const getRandomPositiveInteger = (min, max) => Math.floor((Math.random() * (max - min + 1))) + min;
 
 export const pickRandomElement = (list) => list[getRandomPositiveInteger(0, list.length - 1)];
+
+/**Generates random Boolean based on the percentage provided */
+export const getChanceOfBoolean = (chance) => Math.random() < chance;
+

@@ -37,6 +37,7 @@ export default class PlayState extends State {
 		 */
 		this.maxTimer = 60;
 		this.timer = this.maxTimer;
+		this.secondIncrement = 2; // seconds added per match
 	}
 
 	enter(parameters) {
@@ -236,6 +237,7 @@ export default class PlayState extends State {
 		this.board.matches.forEach((match) => {
 			this.score += match.length * this.baseScore;
 		});
+		this.timer= this.timer+this.secondIncrement;
 	}
 
 	async placeNewTiles() {

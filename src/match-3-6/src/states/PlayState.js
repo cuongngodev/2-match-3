@@ -210,6 +210,10 @@ export default class PlayState extends State {
 		context.fillText(`${this.scoreGoal}`, 250, this.board.y + 165);
 		context.fillText(`${this.timer}`, 250, this.board.y + 225);
 	}
+	/**
+	 * Checks if there is a match on the board.
+	 * @returns boolean if there is any match on the board
+	 */
 	isMatch() {
 		return this.board.matches.length != 0
 	}

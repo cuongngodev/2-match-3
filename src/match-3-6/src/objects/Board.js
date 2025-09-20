@@ -4,10 +4,13 @@ import {
 	images,
 	sounds,
 	timer,
+	chanceOfStar
 } from '../globals.js';
 import Tile from './Tile.js';
 import { SoundName, TileColour, TilePattern } from '../enums.js';
 import {
+	getChanceOfBoolean
+	,
 	getRandomPositiveInteger,
 	pickRandomElement,
 } from '../../lib/Random.js';
@@ -91,12 +94,16 @@ export default class Board {
 			TileColour.Blue,
 			TileColour.Orange,
 		];
-		const patternRange = [TilePattern.Flat, TilePattern.Flat];
+		const patternRange = [TilePattern.Flat, TilePattern.Square];
 		const colour = pickRandomElement(colourList);
-		const pattern = getRandomPositiveInteger(
-			patternRange[0],
-			patternRange[1]
-		);
+		// const pattern = getRandomPositiveInteger(
+		// 	patternRange[0],
+		// 	patternRange[1]
+		// );
+		// // parttern 0 = flat, 5 = star
+
+		const pattern = getChanceOfBoolean
+		(chanceOfStar) ? TilePattern.Star : TilePattern.Flat;
 
 		return new Tile(x, y, colour, pattern, this.tileSprites);
 	}

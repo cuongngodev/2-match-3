@@ -141,17 +141,15 @@ export default class PlayState extends State {
 
 	async swapTiles(highlightedTile) {
 		await this.board.swapTiles(this.selectedTile, highlightedTile);
-		// calculate matches 
-		if (!this.isMatch()) {
-			this.board.revertSwap(this.selectedTile, highlightedTile)
 
-			;
-			sounds.play(SoundName.Error);
-			
-		}
-		// if there is no match , swap back
-		this.selectedTile = null;
+		// calculate matches 
 		await this.calculateMatches();
+		this.selectedTile = null;
+		if (!this.isMatch()) {
+			// if there is no match , swap back
+			this.board.revertSwap(this.selectedTile, highlightedTile);
+			sounds.play(SoundName.Error);
+		}
 	}
 
 	renderSelectedTile() {

@@ -146,11 +146,11 @@ export default class Board {
 		// Swap tiles in the tiles array
 		this.tiles[originalTile.boardY][originalTile.boardX] = originalTile;
 		this.tiles[swappedTile.boardY][swappedTile.boardX] = swappedTile;
-			}
-		async swapTiles(selectedTile, highlightedTile) {
-			const temporaryTile = new Tile(
-				selectedTile.boardX,
-				selectedTile.boardY
+	}
+	async swapTiles(selectedTile, highlightedTile) {
+		const temporaryTile = new Tile(
+			selectedTile.boardX,
+			selectedTile.boardY
 		);
 
 		this.isSwapping = true;
@@ -199,12 +199,16 @@ export default class Board {
 			let matchCounter = 1;
 			let colourToMatch = this.tiles[y][0].colour;
 			let rowMatches = [];
+			let catchStar = false;
 
 			// For every horizontal tile...
 			for (let x = 1; x < Board.SIZE; x++) {
 				// If this is the same colour as the one we're trying to match...
 				if (this.tiles[y][x].colour === colourToMatch) {
 					matchCounter++;
+					if(this.tiles[y][x].pattern === TilePattern.Star){
+						catchStar = true;
+					}
 				} else {
 					// Set this as the new colour we want to watch for.
 					colourToMatch = this.tiles[y][x].colour;
@@ -212,11 +216,18 @@ export default class Board {
 					// If we have a match of 3 or more up until now, add it to our matches array.
 					if (matchCounter >= this.minimumMatchLength) {
 						const match = [];
-
-						// Go backwards from here by matchCounter.
-						for (let x2 = x - 1; x2 >= x - matchCounter; x2--) {
-							// Add each tile to the match that's in that match.
-							match.push(this.tiles[y][x2]);
+						if(catchStar){
+							// if there is a start in the match, add the whole row to the match
+							for(let i = 0; i < Board.SIZE; i++){
+								match.push(this.tiles[y][i]);
+							}
+						}
+						else{
+							// Go backwards from here by matchCounter.
+							for (let x2 = x - 1; x2 >= x - matchCounter; x2--) {
+								// Add each tile to the match that's in that match.
+								match.push(this.tiles[y][x2]);
+							}
 						}
 
 						// Add this match to our total matches array.

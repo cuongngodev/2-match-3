@@ -203,9 +203,6 @@ export default class Board {
 			for (let x = 1; x < Board.SIZE; x++) {
 				if (this.tiles[y][x].colour === colourToMatch) {
 					matchCounter++;
-					// if (this.tiles[y][x].pattern === TilePattern.Star) {
-					// 	catchStar = true;
-					// }
 				} else {
 					if (matchCounter >= this.minimumMatchLength) {
 						let match = [];
@@ -226,7 +223,6 @@ export default class Board {
 					}
 					matchCounter = 1;
 					colourToMatch = this.tiles[y][x].colour;
-					// catchStar = false;
 					if (x >= Board.SIZE - 2) {
 						break;
 					}

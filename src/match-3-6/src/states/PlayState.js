@@ -5,6 +5,7 @@ import State from '../../lib/State.js';
 import Board from '../objects/Board.js';
 import Tile from '../objects/Tile.js';
 import Input from '../../lib/Input.js';
+import { getRandomPositiveInteger } from '../../lib/Random.js';
 
 export default class PlayState extends State {
 	constructor() {
@@ -41,6 +42,7 @@ export default class PlayState extends State {
 		this.matchesInvisible = []
 		this.isShowHint = false; // flag to indicate if hint need to show or not
 		this.nextHint=0
+		this.randomHintIndex;
 	}
 
 	enter(parameters) {
@@ -71,12 +73,12 @@ export default class PlayState extends State {
 		}
 		
 		if (input.isKeyPressed(Input.KEYS.H) && this.hintCount > 0) {// only allow hint when there is hint available
-			
+			this.randomHintIndex = getRandomPositiveInteger(0, this.matchesInvisible.length - 1);
 			this.matchesInvisible = [] // reset previous hint
 			this.isShowHint = true;
 			await this.findMatch();
 			this.hintCount <= 0 ? this.hintCount = 0 : this.hintCount--;
-			this.renderHint();
+			// this.renderHint();
 
 		}
 		timer.update(dt);
@@ -90,11 +92,13 @@ export default class PlayState extends State {
 			this.renderSelectedTile();
 		}
 		if (this.isShowHint && this.matchesInvisible.length > 0) {
-			this.renderHint();
+			if(this.randomHintIndex){
+			this.renderHint(this.randomHintIndex);
 		}
 
 		this.renderCursor();
 		this.renderUserInterface();
+		}
 	}
 
 	updateCursor() {
@@ -214,15 +218,14 @@ async findMatch(){
 		}
 		this.selectedTile = null;
 	}
-	renderHint(){
+	renderHint(hintIndex){
 		context.save();
 		context.fillStyle = 'rgb(255, 255, 255, 0.5)';
 		const HINT_COUNT = 1; // number of hint to show
 		let counter = 1;
 		// get 2 hint at a time
-		this.matchesInvisible.forEach((hint) => {
+		let hint = this.matchesInvisible[hintIndex]
 			if(counter<=HINT_COUNT)	{
-
 				roundedRectangle(
 					context,
 					hint[0].x + this.board.x,
@@ -246,7 +249,7 @@ async findMatch(){
 			}
 			counter++;
 				
-		})
+		
 	}
 	renderSelectedTile() {
 		context.save();

@@ -146,6 +146,7 @@ export default class PlayState extends State {
 		}
 		// Otherwise, do the swap, and check for matches.
 		else {
+			this.isShowHint = false;
 			this.swapTiles(highlightedTile);
 		}
 	}
@@ -211,8 +212,13 @@ async findMatch(){
 	renderHint(){
 		context.save();
 		context.fillStyle = 'rgb(255, 255, 255, 0.5)';
-		let hint = this.matchesInvisible[1]
-		roundedRectangle(
+		const HINT_COUNT = 1; // number of hint to show
+		let counter = 1;
+		// get 2 hint at a time
+		this.matchesInvisible.forEach((hint) => {
+			if(counter<=HINT_COUNT)	{
+
+				roundedRectangle(
 					context,
 					hint[0].x + this.board.x,
 					hint[0].y + this.board.y,
@@ -220,9 +226,9 @@ async findMatch(){
 					Tile.SIZE,
 					10,
 					true,
-					true
+					false
 				);
-		roundedRectangle(
+				roundedRectangle(
 					context,
 					hint[1].x + this.board.x,
 					hint[1].y + this.board.y,
@@ -230,8 +236,12 @@ async findMatch(){
 					Tile.SIZE,
 					10,
 					true,
-					true
+					false
 				);
+			}
+			counter++;
+				
+		})
 	}
 	renderSelectedTile() {
 		context.save();

@@ -327,16 +327,23 @@ export default class Board {
 			// Account for matches at the end of a column.
 			if (matchCounter >= this.minimumMatchLength) {
 				let match = [];
-
+				let catchStar = false;
 				// Go backwards from here by matchCounter.
 				for (
 					let y = Board.SIZE - 1;
 					y >= Board.SIZE - matchCounter;
 					y--
 				) {
+					if(this.tiles[y][x].pattern === TilePattern.Star){
+						catchStar = true;
+					}
 					match.push(this.tiles[y][x]);
 				}
-
+				if(catchStar){
+					for(let i = 0; i < Board.SIZE; i++){
+						match.push(this.tiles[x][i]);
+					}
+				}
 				// Add this match to our total matches array.
 				columnMatches.push(match);
 			}

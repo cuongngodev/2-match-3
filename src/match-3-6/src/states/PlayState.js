@@ -39,7 +39,7 @@ export default class PlayState extends State {
 		this.timer = this.maxTimer;
 		this.secondIncrement = 2; // seconds added per match
 		this.matchesInvisible = []
-		
+		this.isShowHint = false; // flag to indicate if hint need to show or not
 	}
 
 	enter(parameters) {
@@ -70,7 +70,7 @@ export default class PlayState extends State {
 		}
 		if (input.isKeyPressed(Input.KEYS.H)) {
 			this.matchesInvisible = []
-			
+			this.isShowHint = true;
 			await this.findMatch();
 			this.renderHint();
 		}
@@ -83,6 +83,9 @@ export default class PlayState extends State {
 
 		if (this.selectedTile) {
 			this.renderSelectedTile();
+		}
+		if (this.isShowHint && this.matchesInvisible.length > 0) {
+			this.renderHint();
 		}
 
 		this.renderCursor();

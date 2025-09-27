@@ -146,6 +146,42 @@ export default class Board {
 		this.tiles[originalTile.boardY][originalTile.boardX] = originalTile;
 		this.tiles[swappedTile.boardY][swappedTile.boardX] = swappedTile;
 	}
+
+	async swapTilesNoTween(selectedTile, highlightedTile) {
+	// Save original positions
+	const origX = selectedTile.boardX;
+	const origY = selectedTile.boardY;
+	const swapX = highlightedTile.boardX;
+	const swapY = highlightedTile.boardY;
+
+	// Swap board positions
+	selectedTile.boardX = swapX;
+	selectedTile.boardY = swapY;
+	highlightedTile.boardX = origX;
+	highlightedTile.boardY = origY;
+
+	// Swap tiles in the tiles array
+	this.tiles[selectedTile.boardY][selectedTile.boardX] = selectedTile;
+	this.tiles[highlightedTile.boardY][highlightedTile.boardX] = highlightedTile;
+}
+
+	async revertSwapNoTween(swappedTile, originalTile) {
+		// Save current positions
+		const origX = originalTile.boardX;
+		const origY = originalTile.boardY;
+		const swapX = swappedTile.boardX;
+		const swapY = swappedTile.boardY;
+
+		// Swap board positions
+		originalTile.boardX = swapX;
+		originalTile.boardY = swapY;
+		swappedTile.boardX = origX;
+		swappedTile.boardY = origY;
+
+		// Swap tiles in the tiles array
+		this.tiles[originalTile.boardY][originalTile.boardX] = originalTile;
+		this.tiles[swappedTile.boardY][swappedTile.boardX] = swappedTile;
+	}
 	async swapTiles(selectedTile, highlightedTile) {
 		const temporaryTile = new Tile(
 			selectedTile.boardX,

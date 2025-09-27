@@ -29,7 +29,7 @@ export default class PlayState extends State {
 		this.scoreWhenHasStar = 65;
 		// How much scoreGoal will be scaled by per level.
 		this.scoreGoalScale = 1.25;
-
+		this.hintCount = 3; // number of hints available
 		/**
 		 * The timer will countdown and the player must try and
 		 * reach the scoreGoal before time runs out. The timer
@@ -40,6 +40,7 @@ export default class PlayState extends State {
 		this.secondIncrement = 2; // seconds added per match
 		this.matchesInvisible = []
 		this.isShowHint = false; // flag to indicate if hint need to show or not
+		this.nextHint=0
 	}
 
 	enter(parameters) {
@@ -68,11 +69,15 @@ export default class PlayState extends State {
 		if (input.isKeyPressed(Input.KEYS.ENTER) && !this.board.isSwapping) {
 			this.selectTile();
 		}
-		if (input.isKeyPressed(Input.KEYS.H)) {
-			this.matchesInvisible = []
+		
+		if (input.isKeyPressed(Input.KEYS.H) && this.hintCount > 0) {// only allow hint when there is hint available
+			
+			this.matchesInvisible = [] // reset previous hint
 			this.isShowHint = true;
 			await this.findMatch();
+			this.hintCount <= 0 ? this.hintCount = 0 : this.hintCount--;
 			this.renderHint();
+
 		}
 		timer.update(dt);
 	}
@@ -291,15 +296,17 @@ async findMatch(){
 		context.fillStyle = 'white';
 		context.font = '25px Joystix';
 		context.textAlign = 'left';
-		context.fillText(`Level:`, 70, this.board.y + 45);
-		context.fillText(`Score:`, 70, this.board.y + 105);
-		context.fillText(`Goal:`, 70, this.board.y + 165);
-		context.fillText(`Timer:`, 70, this.board.y + 225);
+		context.fillText(`Level:`, 70, this.board.y + 30);
+		context.fillText(`Score:`, 70, this.board.y + 80);
+		context.fillText(`Goal:`, 70, this.board.y + 130);
+		context.fillText(`Timer:`, 70, this.board.y + 180);
+		context.fillText(`Hint:`, 70, this.board.y + 230);
 		context.textAlign = 'right';
-		context.fillText(`${this.level}`, 250, this.board.y + 45);
-		context.fillText(`${this.score}`, 250, this.board.y + 105);
-		context.fillText(`${this.scoreGoal}`, 250, this.board.y + 165);
-		context.fillText(`${this.timer}`, 250, this.board.y + 225);
+		context.fillText(`${this.level}`, 250, this.board.y + 30);
+		context.fillText(`${this.score}`, 250, this.board.y + 80);
+		context.fillText(`${this.scoreGoal}`, 250, this.board.y + 130);
+		context.fillText(`${this.timer}`, 250, this.board.y + 180);
+		context.fillText(`${this.hintCount}`, 250, this.board.y + 230);
 	}
 	/**
 	 * Checks if there is a match on the board.

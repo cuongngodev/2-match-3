@@ -290,7 +290,7 @@ export default class PlayState extends State {
 		if (this.score < this.scoreGoal) {
 			return;
 		}
-
+		this.selectedTile = null;
 		sounds.play(SoundName.NextLevel);
 
 		stateMachine.change(StateName.LevelTransition, {

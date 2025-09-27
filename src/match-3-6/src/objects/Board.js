@@ -247,16 +247,23 @@ export default class Board {
 			// Account for matches at the end of a row.
 			if (matchCounter >= this.minimumMatchLength) {
 				let match = [];
-
+				let catchStar = false;
 				// Go backwards from here by matchCounter.
 				for (
 					let x = Board.SIZE - 1;
 					x >= Board.SIZE - matchCounter;
 					x--
 				) {
+					if(this.tiles[y][x].pattern === TilePattern.Star){
+						catchStar = true;
+					}
 					match.push(this.tiles[y][x]);
 				}
-
+				if(catchStar){
+					for(let i = 0; i < Board.SIZE; i++){
+						match.push(this.tiles[y][i]);
+					}
+				}
 				// Add this match to our total matches array.
 				rowMatches.push(match);
 			}

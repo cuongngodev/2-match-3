@@ -12,7 +12,7 @@ const configFile = './src/config.json';
 const config = await fetch(configFile).then((response) => response.json());
 export const CANVAS_WIDTH = config.width;
 export const CANVAS_HEIGHT = config.height;
-export const chanceOfStar = 0.05; // 5% chance of getting a star pattern
+export const chanceOfStar = 0.08; // 5% chance of getting a star pattern
 const resizeCanvas = () => {
 	const scaleX = window.innerWidth / CANVAS_WIDTH;
 	const scaleY = window.innerHeight / CANVAS_HEIGHT;

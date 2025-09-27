@@ -38,6 +38,8 @@ export default class PlayState extends State {
 		this.maxTimer = 6000;
 		this.timer = this.maxTimer;
 		this.secondIncrement = 2; // seconds added per match
+		this.matchesInvisible = []
+		
 	}
 
 	enter(parameters) {
@@ -49,6 +51,7 @@ export default class PlayState extends State {
 		this.scoreGoal *= Math.floor(this.level * this.scoreGoalScale);
 
 		this.startTimer();
+		
 	}
 
 	exit() {
@@ -56,20 +59,24 @@ export default class PlayState extends State {
 		sounds.pause(SoundName.Music3);
 	}
 
-	update(dt) {
+	async update(dt) {
 		this.scene.update(dt);
 		this.checkGameOver();
 		this.checkVictory();
 		this.updateCursor();
-
 		// If we've pressed enter, select or deselect the currently highlighted tile.
 		if (input.isKeyPressed(Input.KEYS.ENTER) && !this.board.isSwapping) {
 			this.selectTile();
 		}
-
+		if (input.isKeyPressed(Input.KEYS.H)) {
+			this.matchesInvisible = []
+			
+			await this.findMatch();
+			this.renderHint();
+		}
 		timer.update(dt);
 	}
-
+	
 	render() {
 		this.scene.render();
 		this.board.render();
@@ -103,7 +110,8 @@ export default class PlayState extends State {
 		this.cursor.boardX = x;
 		this.cursor.boardY = y;
 	}
-
+	
+	
 	selectTile() {
 		const highlightedTile =
 			this.board.tiles[this.cursor.boardY][this.cursor.boardX];
@@ -138,7 +146,51 @@ export default class PlayState extends State {
 			this.swapTiles(highlightedTile);
 		}
 	}
-
+async findMatch(){
+		// start from the first tile and check all the board
+		// x -> row increment y -> column increment
+		// swap right (x+1)/down (y+1)
+		// if match found return true -> save the position of the 2 tiles, and add to an array
+		// else revert swap
+		// when x>0, x < board.size - 1, y>0, y < board.size -1
+		
+		// start implementing here
+		
+		for (let x = 0; x < Board.SIZE; x++) {
+			for (let y = 0; y < Board.SIZE; y++) {
+				// swap right
+				if (x < Board.SIZE - 1) {
+					await this.board.swapTilesNoTween(
+						this.board.tiles[y][x],
+						this.board.tiles[y][x + 1]
+					);
+					this.board.calculateMatches();
+					if (this.isMatch()) {
+						this.matchesInvisible.push([this.board.tiles[y][x], this.board.tiles[y][x + 1]]);
+					}
+					await this.board.revertSwapNoTween(
+						this.board.tiles[y][x + 1],
+						this.board.tiles[y][x]
+					);
+				}
+				// swap down
+				if (y < Board.SIZE - 1) {
+					await this.board.swapTilesNoTween(
+						this.board.tiles[y][x],
+						this.board.tiles[y + 1][x]
+					);
+					this.board.calculateMatches();
+					if (this.isMatch()) {
+						this.matchesInvisible.push([this.board.tiles[y][x], this.board.tiles[y + 1][x]]);
+					}
+					await this.board.revertSwapNoTween(
+						this.board.tiles[y + 1][x],
+						this.board.tiles[y][x]
+					);
+				}
+			}
+		}
+	}
 	async swapTiles(highlightedTile) {
 		await this.board.swapTiles(this.selectedTile, highlightedTile);
 		this.board.calculateMatches();
@@ -153,7 +205,31 @@ export default class PlayState extends State {
 		}
 		this.selectedTile = null;
 	}
-
+	renderHint(){
+		context.save();
+		context.fillStyle = 'rgb(255, 255, 255, 0.5)';
+		let hint = this.matchesInvisible[1]
+		roundedRectangle(
+					context,
+					hint[0].x + this.board.x,
+					hint[0].y + this.board.y,
+					Tile.SIZE,
+					Tile.SIZE,
+					10,
+					true,
+					true
+				);
+		roundedRectangle(
+					context,
+					hint[1].x + this.board.x,
+					hint[1].y + this.board.y,
+					Tile.SIZE,
+					Tile.SIZE,
+					10,
+					true,
+					true
+				);
+	}
 	renderSelectedTile() {
 		context.save();
 		context.fillStyle = 'rgb(255, 255, 255, 0.5)';

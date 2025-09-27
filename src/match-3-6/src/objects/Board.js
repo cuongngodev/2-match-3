@@ -101,9 +101,8 @@ export default class Board {
 		// 	patternRange[1]
 		// );
 		// // parttern 0 = flat, 5 = star
-
-		const pattern = getChanceOfBoolean
-		(chanceOfStar) ? TilePattern.Star : TilePattern.Flat;
+		// generate star based on chance
+		const pattern = getChanceOfBoolean(chanceOfStar) ? TilePattern.Star : TilePattern.Flat;
 
 		return new Tile(x, y, colour, pattern, this.tileSprites);
 	}
@@ -195,6 +194,7 @@ export default class Board {
 	}
 
 	resolveHorizontalMatches() {
+		
 		for (let y = 0; y < Board.SIZE; y++) {
 			let matchCounter = 1;
 			let colourToMatch = this.tiles[y][0].colour;
@@ -216,8 +216,8 @@ export default class Board {
 					// If we have a match of 3 or more up until now, add it to our matches array.
 					if (matchCounter >= this.minimumMatchLength) {
 						const match = [];
+						// when there is a star in the match, add the whole row to the match
 						if(catchStar){
-							// if there is a start in the match, add the whole row to the match
 							for(let i = 0; i < Board.SIZE; i++){
 								match.push(this.tiles[y][i]);
 							}
@@ -232,6 +232,7 @@ export default class Board {
 
 						// Add this match to our total matches array.
 						rowMatches.push(match);
+						catchStar = false;
 					}
 
 					matchCounter = 1;
@@ -270,12 +271,17 @@ export default class Board {
 			let matchCounter = 1;
 			let colourToMatch = this.tiles[0][x].colour;
 			let columnMatches = [];
+			let catchStar = false;
 
 			// For every vertical tile...
 			for (let y = 1; y < Board.SIZE; y++) {
 				// If this is the same colour as the one we're trying to match...
 				if (this.tiles[y][x].colour === colourToMatch) {
 					matchCounter++;
+					// check if there is a star in the match
+					if(this.tiles[y][x].pattern === TilePattern.Star){
+						catchStar = true;
+					}
 				} else {
 					// Set this as the new colour we want to watch for.
 					colourToMatch = this.tiles[y][x].colour;
@@ -283,12 +289,20 @@ export default class Board {
 					// If we have a match of 3 or more up until now, add it to our matches array.
 					if (matchCounter >= this.minimumMatchLength) {
 						const match = [];
-
-						// Go backwards from here by matchCounter.
-						for (let y2 = y - 1; y2 >= y - matchCounter; y2--) {
-							// Add each tile to the match that's in that match.
-							match.push(this.tiles[y2][x]);
+						if(catchStar){
+							// if there is a start in the match, add the whole column to the match
+							for(let i = 0; i < Board.SIZE; i++){
+								match.push(this.tiles[i][x]);
+							}
 						}
+						// else{
+
+							// Go backwards from here by matchCounter.
+							for (let y2 = y - 1; y2 >= y - matchCounter; y2--) {
+								// Add each tile to the match that's in that match.
+								match.push(this.tiles[y2][x]);
+							}
+						// }
 
 						// Add this match to our total matches array.
 						columnMatches.push(match);

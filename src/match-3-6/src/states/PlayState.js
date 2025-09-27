@@ -26,7 +26,7 @@ export default class PlayState extends State {
 
 		// How much score will be incremented by per match tile.
 		this.baseScore = 5;
-
+		this.scoreWhenHasStar = 65;
 		// How much scoreGoal will be scaled by per level.
 		this.scoreGoalScale = 1.25;
 
@@ -249,9 +249,16 @@ export default class PlayState extends State {
 	}
 
 	calculateScore() {
+
 		this.board.matches.forEach((match) => {
-			this.score += match.length * this.baseScore;
+			if(match.length > 5){
+				this.score += this.scoreWhenHasStar;
+			}else{
+				this.score += match.length * this.baseScore;
+			}
 		});
+	
+		
 		this.timer= this.timer+this.secondIncrement;
 	}
 

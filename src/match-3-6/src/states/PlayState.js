@@ -36,12 +36,11 @@ export default class PlayState extends State {
 		 * reach the scoreGoal before time runs out. The timer
 		 * is reset when entering a new level.
 		 */
-		this.maxTimer = 6000;
+		this.maxTimer = 120;
 		this.timer = this.maxTimer;
 		this.secondIncrement = 2; // seconds added per match
 		this.matchesInvisible = []
 		this.isShowHint = false; // flag to indicate if hint need to show or not
-		this.nextHint=0
 		this.randomHintIndex;
 	}
 
@@ -67,16 +66,20 @@ export default class PlayState extends State {
 		this.checkGameOver();
 		this.checkVictory();
 		this.updateCursor();
+
 		// If we've pressed enter, select or deselect the currently highlighted tile.
 		if (input.isKeyPressed(Input.KEYS.ENTER) && !this.board.isSwapping) {
 			this.selectTile();
 		}
 		
 		if (input.isKeyPressed(Input.KEYS.H) && this.hintCount > 0) {// only allow hint when there is hint available
-			this.randomHintIndex = getRandomPositiveInteger(0, this.matchesInvisible.length - 1);
+			
 			this.matchesInvisible = [] // reset previous hint
-			this.isShowHint = true;
-			await this.findMatch();
+			// generate a random hint index 
+			this.isShowHint = true; 
+			
+			await this.findMatch();// process to find all possible matches
+			this.randomHintIndex = getRandomPositiveInteger(0, this.matchesInvisible.length - 1)
 			this.hintCount <= 0 ? this.hintCount = 0 : this.hintCount--;
 			// this.renderHint();
 
@@ -92,13 +95,11 @@ export default class PlayState extends State {
 			this.renderSelectedTile();
 		}
 		if (this.isShowHint && this.matchesInvisible.length > 0) {
-			if(this.randomHintIndex){
-			this.renderHint(this.randomHintIndex);
+			this.renderHint();
 		}
 
 		this.renderCursor();
 		this.renderUserInterface();
-		}
 	}
 
 	updateCursor() {
@@ -159,16 +160,23 @@ export default class PlayState extends State {
 			this.swapTiles(highlightedTile);
 		}
 	}
-async findMatch(){
-		// start from the first tile and check all the board
-		// x -> row increment y -> column increment
-		// swap right (x+1)/down (y+1)
-		// if match found return true -> save the position of the 2 tiles, and add to an array
-		// else revert swap
-		// when x>0, x < board.size - 1, y>0, y < board.size -1
+	/**
+	 * Finds all possible matches on the board by simulating swaps in the memory for every adjacent tile pair.
+	 * For each tile, try swapping right and down, check for matches, and revert the swap.
+	 * If a match is found after a swap, the tile pair is added to matchesInvisible for hinting purposes.
+	 * 
+	 */
+	async findMatch(){
+	/*Thoughts:
+		start from the first tile and check all the board
+		x -> row increment y -> column increment
+		swap right (x+1)/down (y+1)
+		if match found return true -> save the position of the 2 tiles, and add to an array
+		else revert swap
+		when x>0, x < board.size - 1, y>0, y < board.size -1
 		
-		// start implementing here
-		
+		start implementing
+		*/
 		for (let x = 0; x < Board.SIZE; x++) {
 			for (let y = 0; y < Board.SIZE; y++) {
 				// swap right
@@ -218,23 +226,31 @@ async findMatch(){
 		}
 		this.selectedTile = null;
 	}
-	renderHint(hintIndex){
+	/**
+	 * Renders visual hitns for possible matches on the board by highlighting the pair can result a match
+	 */
+	renderHint(){
 		context.save();
-		context.fillStyle = 'rgb(255, 255, 255, 0.5)';
+		context.fillStyle = 'rgb(255, 255, 255, 0.2)';
+		context.strokeStyle = 'white';
+		context.lineWidth = 2;
+
+
 		const HINT_COUNT = 1; // number of hint to show
 		let counter = 1;
 		// get 2 hint at a time
-		let hint = this.matchesInvisible[hintIndex]
+		// generate random hint. 
+		let hint = this.matchesInvisible[this.randomHintIndex];
 			if(counter<=HINT_COUNT)	{
+				//
 				roundedRectangle(
 					context,
 					hint[0].x + this.board.x,
 					hint[0].y + this.board.y,
 					Tile.SIZE,
 					Tile.SIZE,
-					10,
-					true,
-					false
+					6,
+					true
 				);
 				roundedRectangle(
 					context,
@@ -242,14 +258,13 @@ async findMatch(){
 					hint[1].y + this.board.y,
 					Tile.SIZE,
 					Tile.SIZE,
-					10,
-					true,
-					false
+					6,
+					true
 				);
 			}
 			counter++;
 				
-		
+		context.restore();
 	}
 	renderSelectedTile() {
 		context.save();

@@ -36,7 +36,7 @@ export default class PlayState extends State {
 		 * reach the scoreGoal before time runs out. The timer
 		 * is reset when entering a new level.
 		 */
-		this.maxTimer = 120;
+		this.maxTimer = 60;
 		this.timer = this.maxTimer;
 		this.secondIncrement = 2; // seconds added per match
 		this.matchesInvisible = []
@@ -78,7 +78,7 @@ export default class PlayState extends State {
 			// generate a random hint index 
 			this.isShowHint = true; 
 			
-			await this.findMatch();// process to find all possible matches
+			await this.findMatchesOnTheAir();// process to find all possible matches
 			this.randomHintIndex = getRandomPositiveInteger(0, this.matchesInvisible.length - 1)
 			this.hintCount <= 0 ? this.hintCount = 0 : this.hintCount--;
 			// this.renderHint();
@@ -166,14 +166,16 @@ export default class PlayState extends State {
 	 * If a match is found after a swap, the tile pair is added to matchesInvisible for hinting purposes.
 	 * 
 	 */
-	async findMatch(){
+	async findMatchesOnTheAir(){
 	/*Thoughts:
 		start from the first tile and check all the board
 		x -> row increment y -> column increment
 		swap right (x+1)/down (y+1)
-		if match found return true -> save the position of the 2 tiles, and add to an array
-		else revert swap
-		when x>0, x < board.size - 1, y>0, y < board.size -1
+		if match found return true -> save the position of the 2 tiles, 
+		then and add to an array
+		then revert swap
+		when x>0, x < board.size - 1 && y>0, y < board.size -1
+		
 		
 		start implementing
 		*/
